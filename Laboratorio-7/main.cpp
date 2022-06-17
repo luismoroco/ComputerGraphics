@@ -71,7 +71,6 @@ int main()
         1, 2, 3  // second triangle
     };
 
-
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -148,7 +147,9 @@ int main()
     ourShader.use(); 
     ourShader.setInt("texture2", 1);
 
-    bool r = false;
+    // create transformations
+    glm::mat4 transform = glm::mat4(1.0f);
+    transform = glm::scale(transform, glm::vec3(0.7f, 0.7f, 0.7f));
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
@@ -159,21 +160,33 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture2);
 
         // create transformations
-        glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        
-        static float movR = 0.0f, movD = 0.0f;
 
-        static float angle = 0.0f;
-        if (movD <= 1.5f) {
-            transform = glm::translate(transform, glm::vec3(0.0f, -1*movD, 0.0f));
-            movD += 0.01f;
-        } else if (movR <= 1.5f) {
-            transform = glm::translate(transform, glm::vec3(movR, 0.0f, 0.0f));
-            movR += 0.01f;
-        } else if (angle <= 360){
-            transform = glm::rotate(transform, angle, glm::vec3(0.0f, 0.0f, 1.0f));
-            angle += 0.1f;
-        } 
+        static int itR = 0, itD = 0, itL = 0, itU = 0;
+        if (itR <= 150) {
+            transform = glm::translate(transform, glm::vec3(0.01f, 0.0f, 0.0f));
+            ++itR;
+        }
+        
+        if (itR >= 150 && itD <= 150) {
+            transform = glm::translate(transform, glm::vec3(0.0f, -0.01f, 0.0f));
+            ++itD;
+        }
+
+        if (itR >= 150 && itD >= 150 && itL <= 150) {
+            transform = glm::translate(transform, glm::vec3(-0.01f, 0.0f, 0.0f));
+            ++itL;
+        }
+
+        if (itR >= 150 && itD >= 150 && itL >= 150 && itU <= 150) {
+            transform = glm::translate(transform, glm::vec3(0.0f, 0.01f, 0.0f));
+            ++itU;
+        }
+
+        static int ang = 0;
+        if (itR >= 150 && itD >= 150 && itL >= 150 && itU >= 150 && ang <= 360) {
+            transform = glm::rotate(transform, 0.01f, glm::vec3(0.0f, 0.0f, 1.0f));
+            ++ang;
+        }
 
         // get matrix's uniform location and set matrix
         ourShader.use();
